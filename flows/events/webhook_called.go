@@ -32,27 +32,27 @@ const TypeWebhookCalled string = "webhook_called"
 type WebhookCalledEvent struct {
 	BaseEvent
 
-	URL         string              `json:"url" validate:"required"`
-	Resthook    string              `json:"resthook,omitempty"`
-	Status      flows.WebhookStatus `json:"status" validate:"required"`
-	StatusCode  int                 `json:"status_code,omitempty"`
-	ElapsedMS   int                 `json:"elapsed_ms"`
-	Request     string              `json:"request" validate:"required"`
-	Response    string              `json:"response,omitempty"`
-	BodyIgnored bool                `json:"body_ignored,omitempty"`
+	URL         string           `json:"url" validate:"required"`
+	Resthook    string           `json:"resthook,omitempty"`
+	Status      flows.HTTPStatus `json:"status" validate:"required"`
+	StatusCode  int              `json:"status_code,omitempty"`
+	ElapsedMS   int              `json:"elapsed_ms"`
+	Request     string           `json:"request" validate:"required"`
+	Response    string           `json:"response,omitempty"`
+	BodyIgnored bool             `json:"body_ignored,omitempty"`
 }
 
 // NewWebhookCalledEvent returns a new webhook called event
-func NewWebhookCalledEvent(webhook *flows.WebhookCall) *WebhookCalledEvent {
+func NewWebhookCalledEvent(call flows.HTTPCall) *WebhookCalledEvent {
 	return &WebhookCalledEvent{
 		BaseEvent:   NewBaseEvent(TypeWebhookCalled),
-		URL:         webhook.URL(),
-		Resthook:    webhook.Resthook(),
-		Status:      webhook.Status(),
-		StatusCode:  webhook.StatusCode(),
-		ElapsedMS:   int(webhook.TimeTaken() / time.Millisecond),
-		Request:     webhook.Request(),
-		Response:    webhook.Response(),
-		BodyIgnored: webhook.BodyIgnored(),
+		URL:         call.URL(),
+		Resthook:    call.Resthook(),
+		Status:      call.Status(),
+		StatusCode:  call.StatusCode(),
+		ElapsedMS:   int(call.TimeTaken() / time.Millisecond),
+		Request:     call.Request(),
+		Response:    call.Response(),
+		BodyIgnored: call.BodyIgnored(),
 	}
 }

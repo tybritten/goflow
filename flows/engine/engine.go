@@ -5,11 +5,13 @@ import (
 
 	"github.com/nyaruka/goflow/assets"
 	"github.com/nyaruka/goflow/flows"
+	"github.com/nyaruka/goflow/services/webhooks"
 	"github.com/nyaruka/goflow/utils"
 )
 
 // an instance of the engine
 type engine struct {
+	httpService             flows.HTTPService
 	httpClient              *utils.HTTPClient
 	disableWebhooks         bool
 	maxWebhookResponseBytes int
@@ -36,10 +38,11 @@ func (e *engine) ReadSession(sa flows.SessionAssets, data json.RawMessage, missi
 	return readSession(e, sa, data, missing)
 }
 
-func (e *engine) HTTPClient() *utils.HTTPClient { return e.httpClient }
-func (e *engine) DisableWebhooks() bool         { return e.disableWebhooks }
-func (e *engine) MaxWebhookResponseBytes() int  { return e.maxWebhookResponseBytes }
-func (e *engine) MaxStepsPerSprint() int        { return e.maxStepsPerSprint }
+func (e *engine) HTTPService() flows.HTTPService { return e.httpService }
+func (e *engine) HTTPClient() *utils.HTTPClient  { return e.httpClient }
+func (e *engine) DisableWebhooks() bool          { return e.disableWebhooks }
+func (e *engine) MaxWebhookResponseBytes() int   { return e.maxWebhookResponseBytes }
+func (e *engine) MaxStepsPerSprint() int         { return e.maxStepsPerSprint }
 
 var _ flows.Engine = (*engine)(nil)
 
@@ -57,6 +60,7 @@ func NewBuilder() *Builder {
 	return &Builder{
 		eng: &engine{
 			httpClient:              utils.NewHTTPClient("goflow"),
+			httpService:             webhooks.NewService("goflow", 10000),
 			disableWebhooks:         false,
 			maxWebhookResponseBytes: 10000,
 			maxStepsPerSprint:       100,
@@ -67,6 +71,7 @@ func NewBuilder() *Builder {
 // WithDefaultUserAgent sets the default user-agent string used for webhook calls
 func (b *Builder) WithDefaultUserAgent(userAgent string) *Builder {
 	b.eng.httpClient = utils.NewHTTPClient(userAgent)
+	b.eng.httpService = webhooks.NewService(userAgent, 10000)
 	return b
 }
 

@@ -19,11 +19,11 @@ import (
 )
 
 var webhookCategories = []string{"Success", "Failure"}
-var webhookStatusCategories = map[flows.WebhookStatus]string{
-	flows.WebhookStatusSuccess:         "Success",
-	flows.WebhookStatusResponseError:   "Failure",
-	flows.WebhookStatusConnectionError: "Failure",
-	flows.WebhookStatusSubscriberGone:  "Failure",
+var webhookStatusCategories = map[flows.HTTPStatus]string{
+	flows.HTTPStatusSuccess:         "Success",
+	flows.HTTPStatusResponseError:   "Failure",
+	flows.HTTPStatusConnectionError: "Failure",
+	flows.HTTPStatusSubscriberGone:  "Failure",
 }
 
 var registeredTypes = map[string](func() flows.Action){}
@@ -243,11 +243,11 @@ func (a *BaseAction) saveResult(run flows.FlowRun, step flows.Step, name, value,
 }
 
 // helper to save a run result based on a webhook call and log it as an event
-func (a *BaseAction) saveWebhookResult(run flows.FlowRun, step flows.Step, name string, webhook *flows.WebhookCall, logEvent flows.EventCallback) {
-	input := fmt.Sprintf("%s %s", webhook.Method(), webhook.URL())
-	value := strconv.Itoa(webhook.StatusCode())
-	category := webhookStatusCategories[webhook.Status()]
-	extra := flows.ExtractResponseBody(webhook.Response())
+func (a *BaseAction) saveWebhookResult(run flows.FlowRun, step flows.Step, name string, call flows.HTTPCall, logEvent flows.EventCallback) {
+	input := fmt.Sprintf("%s %s", call.Method(), call.URL())
+	value := strconv.Itoa(call.StatusCode())
+	category := webhookStatusCategories[call.Status()]
+	extra := flows.ExtractResponseBody(call.Response())
 
 	a.saveResult(run, step, name, value, category, "", input, extra, logEvent)
 }

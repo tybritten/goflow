@@ -316,6 +316,8 @@ type Engine interface {
 	NewSession(SessionAssets, Trigger) (Session, Sprint, error)
 	ReadSession(SessionAssets, json.RawMessage, assets.MissingCallback) (Session, error)
 
+	HTTPService() HTTPService
+
 	HTTPClient() *utils.HTTPClient
 	DisableWebhooks() bool
 	MaxWebhookResponseBytes() int

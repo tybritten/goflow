@@ -114,14 +114,14 @@ func (a *CallWebhookAction) Execute(run flows.FlowRun, step flows.Step, logModif
 		req.Header.Add(key, headerValue)
 	}
 
-	webhook, err := flows.MakeWebhookCall(run.Session(), req, "")
+	call, err := run.Session().Engine().HTTPService().Request(req, "")
 
 	if err != nil {
 		logEvent(events.NewErrorEvent(err))
 	} else {
-		logEvent(events.NewWebhookCalledEvent(webhook))
+		logEvent(events.NewWebhookCalledEvent(call))
 		if a.ResultName != "" {
-			a.saveWebhookResult(run, step, a.ResultName, webhook, logEvent)
+			a.saveWebhookResult(run, step, a.ResultName, call, logEvent)
 		}
 	}
 
